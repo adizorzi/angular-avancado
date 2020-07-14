@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable, throwError, from } from 'rxjs';
 import { map, catchError, flatMap } from 'rxjs/operators';
-import { Entry } from './entry-model';
+import { Entry } from './entry.model';
 import { element } from '@angular/core/src/render3';
 
 @Injectable({
@@ -11,14 +11,14 @@ import { element } from '@angular/core/src/render3';
 })
 export class EntryService {
 
-  private apiPath: string = 'api/categories';
+  private apiPath: string = 'api/entries';
 
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<Entry[]>{
     return this.http.get(this.apiPath).pipe(
       catchError(this.handleError),
-      map(this.jsonDataToCategories)
+      map(this.jsonDataToEntries)
     )
   }
 
@@ -56,14 +56,19 @@ export class EntryService {
     )
   }
 
-  private jsonDataToCategories(jsonData: any[]): Entry[] {
-    const categories: Entry[] = [];
-    jsonData.forEach(element => categories.push(element as Entry));
-    return categories;
+  private jsonDataToEntries(jsonData: any[]): Entry[] {
+    const entries: Entry[] = [];
+
+    jsonData.forEach(element => {
+      const entry = Object.assign(new Entry(), element);
+      entries.push(entry);
+    });
+
+    return entries;
   }
 
   private jsonDataToEntry(jsonData:any): Entry{
-    return jsonData as Entry;
+    return Object.assign(new Entry(), jsonData);
   }
 
   private handleError(error: any): Observable<any>{
